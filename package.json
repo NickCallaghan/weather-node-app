@@ -1,0 +1,11 @@
+{
+  "name": "node_weather_console_app",
+  "version": "1.0.0",
+  "description": "console app which allows user to specify command line arguments for the location and fetches a weather summary from the open weather api before printing it to the console.",
+  "main": "weather.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nick Callaghan",
+  "license": "MIT"
+}
