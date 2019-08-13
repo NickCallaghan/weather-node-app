@@ -14,8 +14,8 @@ function printWeather(weather) {
     console.log(`The weather in ${weather.name}, ${weather.sys.country} is: ${weather.weather[0].description} and current temparature is ${weather.main.temp} kelvin `);
 }
 
-function printError(messgage) {
-
+function printError(error) {
+    console.error(error.message);
 }
 
 function get(apiKey, location) {
@@ -35,12 +35,13 @@ function get(apiKey, location) {
                     printWeather(weather);
                 })
             } else {
-                // handle error
+                const statusCodeError = new Error(`There was an error getting the message for: ${location}. (${http.STATUS_CODES[res.statusCode]})`);
+                printError(statusCodeError)
             }
         });
 
     } catch (err) {
-        console.log(err.messgage);
+        console.log(err.message);
     }
 }
 
