@@ -1,51 +1,56 @@
-const http = require("http");
-const cliArguments = process.argv.slice(2);
+const fetch = require("node-fetch");
 require("dotenv").config();
 
 // This app users the open weather api, please sign up for an api key at www.openweathermap.org
-const apiKey = process.env.API_KEY;
 
-function location(cliArguments) {
-  const location = `${cliArguments[0]},${cliArguments[1]}`;
-  return location;
+const safeSpeed = process.env.SAFE_SPEED;
+
+function getWindSpeeds(weather) {
+  const windspeeds = [...weather.list].map(obj => {
+    const forecast = {
+      dt: obj.dt,
+      dtText: obj.dt_txt,
+      windspeed: obj.wind.speed,
+      windDirection: obj.wind.deg
+    };
+    return forecast;
+  });
+  return windspeeds;
 }
 
-function printWeather(weather) {
-  console.log(
-    `The weather in ${weather.name}, ${weather.sys.country} is: ${weather.weather[0].description} clear and the windspeed is ${weather.wind.speed}mps`
-  );
+function determineMaxWindSpeed(windspeeds) {
+  const windspeedArr = [];
+  windspeeds.forEach(forecast => {
+    windspeedArr.push(forecast.windspeed);
+  });
+  const maxWindspeed = Math.max(...windspeedArr);
+  return maxWindspeed;
 }
 
-function printError(error) {
-  console.error(error.message);
+function filterWindSpeeds(windspeeds, date = new Date()) {
+  const dateString = `${date.getFullYear()}-${date.getMonth() +
+    1}-${date.getDate()}`;
+  const regex = new RegExp(dateString);
+  const todaysWindSpeeds = windspeeds.filter(forecast => {
+    return regex.test(forecast.dtText);
+  });
+  return todaysWindSpeeds;
 }
 
-function get(apiKey, location) {
-  const queryString = `http://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${apiKey}`;
-  try {
-    const request = http.get(queryString, res => {
-      if (res.statusCode === 200) {
-        let body = "";
-        // Read data
-        res.on("data", chunk => {
-          body += chunk;
-        });
-        res.on("end", () => {
-          const weather = JSON.parse(body);
-          printWeather(weather);
-        });
-      } else {
-        const statusCodeError = new Error(
-          `There was an error getting the message for: ${location}. (${
-            http.STATUS_CODES[res.statusCode]
-          })`
-        );
-        printError(statusCodeError);
-      }
-    });
-  } catch (err) {
-    console.log(err.message);
-  }
-}
+module.exports = async function getOWForecast(apiKey, lat, long) {
+  const queryString = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${long}&APPID=${apiKey}`;
 
-get(apiKey, location(cliArguments));
+  const response = await fetch(queryString);
+  const weather = await response.json();
+  const windspeeds = getWindSpeeds(weather);
+  const todaysWindSpeeds = filterWindSpeeds(windspeeds);
+  const maxWindSpeed = determineMaxWindSpeed(todaysWindSpeeds);
+  const isSafeToErect = maxWindSpeed < safeSpeed ? true : false;
+  const weatherReport = {
+    windspeeds: todaysWindSpeeds,
+    maxWindSpeed,
+    isSafeToErect
+  };
+  console.log(weatherReport);
+  return weatherReport;
+};
