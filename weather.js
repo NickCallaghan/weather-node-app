@@ -38,19 +38,23 @@ function filterWindSpeeds(windspeeds, date = new Date()) {
 }
 
 module.exports = async function getOWForecast(apiKey, lat, long) {
-  const queryString = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${long}&APPID=${apiKey}`;
+  try {
+    const queryString = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${long}&APPID=${apiKey}`;
 
-  const response = await fetch(queryString);
-  const weather = await response.json();
-  const windspeeds = getWindSpeeds(weather);
-  const todaysWindSpeeds = filterWindSpeeds(windspeeds);
-  const maxWindSpeed = determineMaxWindSpeed(todaysWindSpeeds);
-  const isSafeToErect = maxWindSpeed < safeSpeed ? true : false;
-  const weatherReport = {
-    windspeeds: todaysWindSpeeds,
-    maxWindSpeed,
-    isSafeToErect
-  };
-  console.log(weatherReport);
-  return weatherReport;
+    const response = await fetch(queryString);
+    const weather = await response.json();
+    const windspeeds = getWindSpeeds(weather);
+    const todaysWindSpeeds = filterWindSpeeds(windspeeds);
+    const maxWindSpeed = determineMaxWindSpeed(todaysWindSpeeds);
+    const isSafeToErect = maxWindSpeed < safeSpeed ? true : false;
+    const weatherReport = {
+      windspeeds: todaysWindSpeeds,
+      maxWindSpeed,
+      isSafeToErect
+    };
+    console.log(weatherReport);
+    return weatherReport;
+  } catch (err) {
+    console.log(err);
+  }
 };

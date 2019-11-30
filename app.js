@@ -11,16 +11,6 @@ const port = process.env.PORT;
 
 app.use(express.json());
 
-function asyncHandler(cb) {
-  return async (req, res, next) => {
-    try {
-      await cb(req, res, next);
-    } catch (err) {
-      next(err);
-    }
-  };
-}
-
 app.get("/api", async (req, res) => {
   const weatherReport = await weather(apiKey, lat, long);
   console.log(weather);
