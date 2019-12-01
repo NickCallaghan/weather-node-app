@@ -28,8 +28,9 @@ function determineMaxWindSpeed(windspeeds) {
 }
 
 function filterWindSpeeds(windspeeds, date = new Date()) {
-  const dateString = `${date.getFullYear()}-${date.getMonth() +
-    1}-${date.getDate()}`;
+  //   const dateString = `${date.getFullYear()}-${date.getMonth() +
+  //     1}-${date.getDate()}`;
+  const dateString = `2019-12-01`;
   const regex = new RegExp(dateString);
   const todaysWindSpeeds = windspeeds.filter(forecast => {
     return regex.test(forecast.dtText);
