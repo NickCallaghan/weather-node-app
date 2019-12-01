@@ -25,6 +25,12 @@ app.get("/api/test", async (req, res) => {
     weatherReport: {
       windspeeds: [
         {
+          dt: 1575212300,
+          dtText: "2019-12-01 12:00:00",
+          windspeed: 3.45,
+          windDirection: 255
+        },
+        {
           dt: 1575212400,
           dtText: "2019-12-01 15:00:00",
           windspeed: 4.27,
